@@ -1,21 +1,16 @@
-# uncompyle6 version 3.7.4
-# Python bytecode 3.7 (3394)
-# Decompiled from: Python 3.7.3 (default, Mar 27 2019, 17:13:21) [MSC v.1915 64 bit (AMD64)]
-# Embedded file name: C:\Users\diana_aimbetova\PycharmProjects\tagcounter\venv\Scripts\db_worker.py
-# Compiled at: 2020-11-08 18:27:11
-# Size of source mod 2**32: 2036 bytes
 import sqlite3
-from datetime import date
+from datetime import datetime
+import logging
 
 def create_connection():
     conn = None
     try:
         conn = sqlite3.connect('mydatabase.db')
-        print('Get connected to SQLite...')
+        logging.info(str(datetime.now()) + ' Get connected to SQLite...')
         return conn
     except sqlite3.Error as e:
         try:
-            print(e)
+            logging.error(str(datetime.now()()) + e)
         finally:
             e = None
             del e
@@ -26,11 +21,12 @@ def create_connection():
 def create_table(conn):
     try:
         cursor = conn.cursor()
-        cursor.execute('CREATE TABLE IF NOT EXISTS tags\n                          (site_name,url,date,tags)\n                       ')
-        print('Getting cursor...')
+        cursor.execute('CREATE TABLE IF NOT EXISTS tags\n                          '
+                       '(site_name,url,date,tags)\n                       ')
+        logging.info(str(datetime.now()) + ' Getting cursor...')
     except sqlite3.Error as e:
         try:
-            print(e)
+            logging.error(str(datetime.now()) + e)
         finally:
             e = None
             del e
@@ -39,18 +35,23 @@ def create_table(conn):
 
 
 def insert_tags(site_name, url, tags):
+    code = 200
     try:
         try:
             conn = create_connection()
             cursor = create_table(conn)
-            sqlite_insert_with_param = 'INSERT INTO tags\n                                 (site_name, url, date, tags) \n                                 VALUES (?, ?, ?, ?);'
-            data_tuple = (site_name, url, str(date.today()), str(tags))
+            sqlite_insert_with_param = 'INSERT INTO tags\n                                 ' \
+                                       '(site_name, url, date, tags) \n                                 ' \
+                                       'VALUES (?, ?, ?, ?);'
+            data_tuple = (site_name, url, str(datetime.now()), str(tags))
             cursor.execute(sqlite_insert_with_param, data_tuple)
             conn.commit()
-            print('Data is successfully inserted into table...')
+            logging.info(str(datetime.now()) + ' Data is successfully inserted into table...')
+            return code
         except sqlite3.Error as e:
             try:
-                print(e)
+                logging.error(str(datetime.now()) +'\n'+ e)
+                return 500
             finally:
                 e = None
                 del e
@@ -58,10 +59,11 @@ def insert_tags(site_name, url, tags):
     finally:
         if conn:
             conn.close()
-            print('The SQLite connection is closed')
+            logging.info(str(datetime.now()) + ' The SQLite connection is closed')
 
 
 def select_tags(url):
+    result = ''
     try:
         try:
             conn = create_connection()
@@ -69,19 +71,20 @@ def select_tags(url):
             sqlite_select_query = 'SELECT * from tags WHERE url = ?'
             cursor.execute(sqlite_select_query, (url,))
             records = cursor.fetchall()
-            print('Total rows are:  ', len(records))
-            print('Printing each row')
+            result += 'Total rows are:  ' + str(len(records)) + '\n'
             for row in records:
-                print('Site_name: ', row[0])
-                print('URL: ', row[1])
-                print('Date: ', row[2])
-                print('Tags: ', row[3])
-                print('\n')
+                result += 'Site_name: '+ str(row[0]) + '\n'
+                result += 'URL: '+ str(row[1]) + '\n'
+                result += 'Date: ' + str(row[2]) + '\n'
+                result += 'Tags: ' + str(row[3]) + '\n'
+
 
             cursor.close()
+            return result
         except sqlite3.Error as e:
             try:
-                print(e)
+                logging.error(str(datetime.now()) + '\n' + e)
+                return e
             finally:
                 e = None
                 del e
@@ -89,4 +92,5 @@ def select_tags(url):
     finally:
         if conn:
             conn.close()
-            print('The SQLite connection is closed')
+            logging.info(str(datetime.now()) + ' The SQLite connection is closed')
+            return str(result)

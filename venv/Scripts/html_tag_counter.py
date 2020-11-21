@@ -1,9 +1,3 @@
-# uncompyle6 version 3.7.4
-# Python bytecode 3.7 (3394)
-# Decompiled from: Python 3.7.3 (default, Mar 27 2019, 17:13:21) [MSC v.1915 64 bit (AMD64)]
-# Embedded file name: C:\Users\diana_aimbetova\PycharmProjects\tagcounter\venv\Scripts\html_tag_counter.py
-# Compiled at: 2020-11-08 17:37:51
-# Size of source mod 2**32: 407 bytes
 from html.parser import HTMLParser
 tags = {}
 
